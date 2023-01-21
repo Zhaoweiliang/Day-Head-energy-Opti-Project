@@ -5,7 +5,7 @@ import pandas as pd
 Data = pd.read_csv('/Users/weiliang/Desktop/project/Veri_1.in',header = None)
 Data.columns= ['ID','OrderID','Hour','BitType','Quantity','price','Duration','LinkID']
 
-def HourBit():
+def HourBid():
     Index = []
     for i in range(len(Data)):
         if Data['BitType'][i]=='S':
@@ -45,8 +45,8 @@ def Hour_Index(df):
         S = End+1
     return Index
             
-HIndex_S=Hour_Index(HourBit()[0])
-HIndex_D=Hour_Index(HourBit()[1])
+HIndex_S=Hour_Index(HourBid()[0])
+HIndex_D=Hour_Index(HourBid()[1])
 
 def find_largest(IND):
     Res = IND[0][1]-IND[0][1]
