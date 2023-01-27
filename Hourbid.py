@@ -2,7 +2,7 @@ from gurobipy import *
 import numpy as np
 import pandas as pd
 
-Data = pd.read_csv('/Users/weiliang/Desktop/project/Veri_1.in',header = None)
+Data = pd.read_csv('Veri_1.in',header = None)
 Data.columns= ['ID','OrderID','Hour','BitType','Quantity','price','Duration','LinkID']
 
 def HourBid():
