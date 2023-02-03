@@ -4,7 +4,6 @@ import pandas as pd
 
 Data = pd.read_csv('Veri_1.in',header = None)
 Data.columns= ['ID','OrderID','Hour','BitType','Quantity','price','Duration','LinkID']
-
 def HourBid():
     Index = []
     for i in range(len(Data)):
@@ -19,18 +18,23 @@ def HourBid():
             Index_D.append(i)
         else:
             Index_S.append(i)
+    Index_DR = []
+    INT = [999,1999,2999,3999,4999,5999,6999,7999,8999,9999,10999,11999,12999,13999,14999,15999,16999,17999,18999,19999,20999,21999,22999,23999]
+    for i in range(24):
+        for j in range(1000):
+            # print(999*(i+1)-j)
+            Index_DR.append(Index_S[INT[i]-j])
 
-    Data_H_D = Data_H.iloc[Index_S]
+    Data_H_D = Data_H.iloc[Index_DR]
     Data_H_D = Data_H_D.reset_index(drop=True)
     Data_H_S = Data_H.iloc[Index_D]
     Data_H_S = Data_H_S.reset_index(drop=True)
     Data_H_SP = Data_H_S
-    Hour = []
     # for i in range(len(Data_H_SP)):
         
     #     Data_H_SP['Quantity'][i] = Data_H_S['Quantity'][i]
     Data_H_SP['Quantity']=Data_H_SP['Quantity'].abs()
-    return(Data_H_SP,Data_H_D)
+    return(Data_H_SP,Data_H_D,Index_DR)
 
 def Hour_Index(df):
     Index = []
