@@ -63,7 +63,7 @@ SMax_Res = [[] for i in range(24)]
 Sm_Res = [[] for i in range(24)]
 
 for i in range(24):
-    DMax_Res[i].append(HD_bids['price'][HIndex_D[i][1]])
+    DMax_Res[i].append(HD_bids['price'][HIndex_D[i][0]])
     DMax_Res[i].append(find_F(Delta_D,L_D,BD_bids)[0][i])
     DMax_Res[i].append(FD_max)
     
@@ -73,7 +73,7 @@ for i in range(24):
     SMax_Res[i].append(FS_max)
     
 for i in range(24):
-    Dm_Res[i].append(HD_bids['price'][HIndex_D[i][0]])
+    Dm_Res[i].append(HD_bids['price'][HIndex_D[i][1]])
     Dm_Res[i].append(find_F(Delta_D,L_D,BD_bids)[1][i])
     Dm_Res[i].append(FD_min)
     
@@ -121,38 +121,54 @@ E.setObjective(sum(0.5*(2*Pair(j,h,HD_bids,'DP')[0]+xD[h,j]*(Pair(j,h,HD_bids,'D
                 
 ,GRB.MAXIMIZE)
 
-gamma = 100000000000000000
+gamma = 100000000000000000000000000000000000
 
-# Add Constrs
+        # (2)
 E.addConstrs(-sum((Pair(j,h,HD_bids,'DQ')[1]-Pair(j,h,HD_bids,'DQ')[0]) * xD[h,j] for j in J ) +sum((Pair(j,h,HS_bids,'SQ')[1]-Pair(j,h,HS_bids,'SQ')[0])*xS[h,j] for j in J) -Pair(1,h,HD_bids,'DQ')[0] +Pair(1,h,HS_bids,'SQ')[0] 
                     +sum(Delta_S[i,h-1]*BS_bids['Quantity'][i]*yS[i] for i in range(L_S))  -sum(Delta_D[i,h-1]*BD_bids['Quantity'][i]*yD[i] for i in range(L_D))
-                    +sum(FS_bids['price'][i]*V_S[h,i]for i in range(L_FS))-sum(FD_bids['price'][i]*V_D[h,i]for i in range(L_FD))
-                    ==0 for h in H)
+                    +sum(FS_bids['Quantity'][i]*V_S[h,i]for i in range(L_FS))-sum(FD_bids['Quantity'][i]*V_D[h,i]for i in range(L_FD))
+                    
+                    ==0 for h in H) 
+ 
+
+
 E.addConstrs(F_z[h] == Sm_Res[h-1][0]+sum((Pair(j,h,HS_bids,'SP')[1]-Pair(j,h,HS_bids,'SP')[0]) * xS[h,j] for j in J)for h in H)        
 E.addConstrs(F_z[h] == DMax_Res[h-1][0]+sum((Pair(j,h,HD_bids,'DP')[1]-Pair(j,h,HD_bids,'DP')[0]) * xD[h,j] for j in J) for h in H)
-
 # (8)
-E.addConstrs(-BS_bids['Duration'][j]* BS_bids['price'][j]+ sum(Delta_S[j,h-1]*F_zS[h] for h in H ) <= yS[j]*gamma for j in range(L_S))
+
+E.addConstrs(-BS_bids['Duration'][j]* BS_bids['price'][j]+ sum(Delta_S[j,h-1]*F_z[h] for h in H ) <= yS[j]*gamma for j in range(L_S))
 # (9)
-E.addConstrs(BD_bids['Duration'][j]*BD_bids['price'][j]- sum(Delta_S[j,h-1]*F_zD[h] for h in H) <= yD[j]*gamma for j in range(L_D))
-                
+
+E.addConstrs(BD_bids['Duration'][j]*BD_bids['price'][j]- sum(Delta_S[j,h-1]*F_z[h] for h in H) <= yD[j]*gamma for j in range(L_D))
+        
+    # E.addConstr(if Blockbid['LinkID'][j] == 'NaN': Blockbid['Duration'][j]*Blockbid['price'][j]+ sum(Delta_S[j,h]*F_z[h] for j in J) <= yd[j]*gamma)
+        
 # (3)(4)
 # Demand
 E.addConstrs(w_D[h,1]<=xD[h,1] for h in H)
 E.addConstrs(xD[h,1] <=1 for h in H)
-E.addConstrs(w_D[h,j]<=xD[h,j] for j in range(2,find_largest(HIndex_D)+1) for h in H)
-E.addConstrs(xD[h,j]<=w_D[h,j-1] for j in range(2,find_largest(HIndex_D)+1) for h in H)
-# Supply 
+E.addConstrs(w_D[h,j]<=xD[h,j] for j in range(2,find_largest(HIndex_D)) for h in H)
+E.addConstrs(xD[h,j]<=w_D[h,j-1] for j in range(2,find_largest(HIndex_D)) for h in H)
+E.addConstrs(0<= xD[h,999] for h in H)
+E.addConstrs(xD[h,999] <= w_D[h,998] for h in H)
+
+# Supply
 E.addConstrs(w_S[h,1]<=xS[h,1] for h in H)
 E.addConstrs(xS[h,1] <=1 for h in H)
-E.addConstrs(w_S[h,j]<=xS[h,j] for j in range(2,find_largest(HIndex_S)+1) for h in H)
-E.addConstrs(xS[h,j]<=w_S[h,j-1] for j in range(2,find_largest(HIndex_S)+1) for h in H)
-# Flexible 
+E.addConstrs(w_S[h,j]<=xS[h,j] for j in range(2,find_largest(HIndex_S)) for h in H)
+E.addConstrs(xS[h,j]<=w_S[h,j-1] for j in range(2,find_largest(HIndex_S)) for h in H)
+E.addConstrs(0<= xS[h,999] for h in H)
+E.addConstrs(xS[h,999] <= w_S[h,998] for h in H)
+
+
 E.addConstrs(sum(V_S[h,i] for h in H )<= 1 for i in range(L_FS) )
 E.addConstrs(sum(V_D[h,i] for h in H )<= 1 for i in range(L_FD) )
-#
-E.addConstrs(F_zS[h]-FS_bids['price'][i] <= gamma*sum(V_S[k,i] for k in H) for i in range(L_FS) for h in H)
-E.addConstrs(FD_bids['price'][i]-F_zD[h]<=gamma*sum(V_D[k,i] for k in H) for i in range(L_FD) for h in H)
+
+E.addConstrs(F_z[h]-FS_bids['price'][i] <= gamma*sum(V_S[k,i] for k in H) for i in range(L_FS) for h in H)
+E.addConstrs(FD_bids['price'][i]-F_z[h]<=gamma*sum(V_D[k,i] for k in H) for i in range(L_FD) for h in H)
+
+
+
 
 
 E.optimize()

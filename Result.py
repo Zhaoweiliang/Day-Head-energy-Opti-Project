@@ -3,7 +3,6 @@ from OPT import *
 
 E.optimize()
 
-
 Index = [v.VarName for v in V_D.values()]
 value = [v.x for v in V_D.values()]
 Solution_FD = [[] for i in range(len(Index))]
