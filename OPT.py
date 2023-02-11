@@ -121,7 +121,7 @@ E.setObjective(sum(0.5*(2*Pair(j,h,HD_bids,'DP')[0]+xD[h,j]*(Pair(j,h,HD_bids,'D
                 
 ,GRB.MAXIMIZE)
 
-gamma = 100000000000000000000000000000000000
+gamma = 1000000
 
         # (2)
 E.addConstrs(-sum((Pair(j,h,HD_bids,'DQ')[1]-Pair(j,h,HD_bids,'DQ')[0]) * xD[h,j] for j in J ) +sum((Pair(j,h,HS_bids,'SQ')[1]-Pair(j,h,HS_bids,'SQ')[0])*xS[h,j] for j in J) -Pair(1,h,HD_bids,'DQ')[0] +Pair(1,h,HS_bids,'SQ')[0] 
