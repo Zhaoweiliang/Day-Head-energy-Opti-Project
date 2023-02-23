@@ -16,6 +16,27 @@ FD_bids = Fibid()[1]
 # length of the bids
 L_D = len(BD_bids)
 L_S = len(Blockbid()[0])
+
+NoneChild_D=[]
+Child_D = []
+Parent_D=[]
+NoneChild_S=[]
+Child_S=[]
+Parent_S=[]
+for i in range(L_D):
+    if BD_bids.isnull()['LinkID'][i] == True:
+        NoneChild_D.append(i)
+    else:
+        Parent_D.append(np.where(BD_bids['ID']==BD_bids['LinkID'][i])[0][0])
+        Child_D.append(i)
+for i in range(L_S):
+    if BS_bids.isnull()['LinkID'][i] == True:
+        NoneChild_S.append(i)
+    else:
+        Parent_S.append(np.where(BS_bids['ID']==BS_bids['LinkID'][i])[0][0])
+        Child_S.append(i)
+        
+
 L_FD = len(Fibid()[1])
 L_FS = len(Fibid()[0])
 J = np.arange(1,find_largest(HIndex_D)+1)
@@ -136,10 +157,10 @@ E.addConstrs(F_z[h] == Sm_Res[h-1][0]+sum((Pair(j,h,HS_bids,'SP')[1]-Pair(j,h,HS
 E.addConstrs(F_z[h] == DMax_Res[h-1][0]+sum((Pair(j,h,HD_bids,'DP')[1]-Pair(j,h,HD_bids,'DP')[0]) * xD[h,j] for j in J) for h in H)
 # (8)
 
-E.addConstrs(-BS_bids['Duration'][j]* BS_bids['price'][j]+ sum(Delta_S[j,h-1]*F_z[h] for h in H ) <= yS[j]*gamma for j in range(L_S))
+E.addConstrs(-BS_bids['Duration'][j]* BS_bids['price'][j]+ sum(Delta_S[j,h-1]*F_z[h] for h in H ) <= yS[j]*gamma for j in NoneChild_S)
 # (9)
 
-E.addConstrs(BD_bids['Duration'][j]*BD_bids['price'][j]- sum(Delta_S[j,h-1]*F_z[h] for h in H) <= yD[j]*gamma for j in range(L_D))
+E.addConstrs(BD_bids['Duration'][j]*BD_bids['price'][j]- sum(Delta_S[j,h-1]*F_z[h] for h in H) <= yD[j]*gamma for j in NoneChild_D)
         
     # E.addConstr(if Blockbid['LinkID'][j] == 'NaN': Blockbid['Duration'][j]*Blockbid['price'][j]+ sum(Delta_S[j,h]*F_z[h] for j in J) <= yd[j]*gamma)
         
@@ -167,6 +188,8 @@ E.addConstrs(sum(V_D[h,i] for h in H )<= 1 for i in range(L_FD) )
 E.addConstrs(F_z[h]-FS_bids['price'][i] <= gamma*sum(V_S[k,i] for k in H) for i in range(L_FS) for h in H)
 E.addConstrs(FD_bids['price'][i]-F_z[h]<=gamma*sum(V_D[k,i] for k in H) for i in range(L_FD) for h in H)
 
+E.addConstrs(yD[Child_D[i]]<=yD[Parent_D[i]] for i in range(len(Child_D)))
+E.addConstrs(yS[Child_S[i]]<=yS[Parent_S[i]] for i in range(len(Child_S)))
 
 
 
