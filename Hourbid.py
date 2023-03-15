@@ -34,7 +34,7 @@ def HourBid():
         
     #     Data_H_SP['Quantity'][i] = Data_H_S['Quantity'][i]
     Data_H_SP['Quantity']=Data_H_SP['Quantity'].abs()
-    return(Data_H_SP,Data_H_D,Index_DR)
+    return(Data_H_SP,Data_H_D,Data_H)
 
 def Hour_Index(df):
     Index = []
