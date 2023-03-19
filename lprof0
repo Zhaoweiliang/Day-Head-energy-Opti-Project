@@ -1,14 +1,36 @@
-Timer unit: 1e-07 s
+Timer unit: 1e-09 s
 
-Total time: 2.25e-05 s
-File: <ipython-input-178-c9e37017f968>
-Function: select at line 1
+Total time: 13.8269 s
+File: /var/folders/q5/c6zwkpms6lndl60vswwpd_4w0000gn/T/ipykernel_48604/2308333257.py
+Function: test at line 2
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-     1                                           def select(List1,List2,SLD_size):
-     2         1        201.0    201.0     89.3      begin = random.randint(SLD_size,len(List1)-SLD_size)
-     3         1         10.0     10.0      4.4      temp =List1[begin:begin+SLD_size] 
-     4         1          9.0      9.0      4.0      List1[begin:begin+SLD_size]=List2[begin:begin+SLD_size]
-     5         1          3.0      3.0      1.3      List2[begin:begin+SLD_size] = temp
-     6         1          2.0      2.0      0.9      return List1,List2
+     2                                           def test():
+     3         1          0.0      0.0      0.0      Sub_pop = []
+     4         2    4488000.0 2244000.0      0.0      for i in tqdm(range(2)):
+     5         2          0.0      0.0      0.0          Error= True
+     6         2     544000.0 272000.0      0.0          p1 = select()
+     7         2      53000.0  26500.0      0.0          p2 = select()
+     8         8       4000.0    500.0      0.0          while Error!=False:
+     9                                                       # cross
+    10                                           
+    11                                                       
+    12         8 1178969000.0 147371125.0      8.5              p1,p2 = cross(p1,p2,5)
+    13                                                       #mut
+    14         8  712519000.0 89064875.0      5.2              p1 = mut(p1)
+    15         8  669315000.0 83664375.0      4.8              p2 = mut(p2)
+    16                                                       # mark
+    17         8 1587313000.0 198414125.0     11.5              p1A,s,d,p=RE_aggregate(p1)
+    18         8 1542605000.0 192825625.0     11.2              p2A,s1,d1,p=RE_aggregate(p2)
+    19         8 3977691000.0 497211375.0     28.8              scoreA,EA,priceA =fit(p1A,s,d)
+    20         8 4151743000.0 518967875.0     30.0              score2A,E2A,price2A =fit(p2A,s1,d1)
+    21         6       8000.0   1333.3      0.0              if EA == False and E2A == False:
+    22         2          0.0      0.0      0.0                  Error = False
+    23         2          0.0      0.0      0.0                  p1A[6]=(scoreA)
+    24         2       1000.0    500.0      0.0                  p2A[6]=(score2A)
+    25         2       8000.0   4000.0      0.0                  Sol_set1.append(p1A)
+    26         2          0.0      0.0      0.0                  Sol_set1.append(p2A)
+    27         2    1644000.0 822000.0      0.0          sorted_id = sorted(range(len(Sol_set1)), key=lambda k: Sol_set1[k][6], reverse=True)
+    28         2      28000.0  14000.0      0.0          new = [Sol_set1[i] for i in sorted_id[0:100]]
+    29         1          0.0      0.0      0.0      return new
